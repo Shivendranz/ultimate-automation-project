@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 5s # Har 5 second mein data uthao
+
+scrape_configs:
+  - job_name: 'flask_app'
+    static_configs:
+      - targets: ['flask_app:5000']
+
+  - job_name: 'node_exporter' # Server ki health ke liye
+    static_configs:
+      - targets: ['node_exporter:9100']
