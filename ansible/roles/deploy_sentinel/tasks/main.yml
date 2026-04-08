@@ -1,0 +1,25 @@
+---
+- name: Ensure project directory exists
+  file:
+    path: "/home/ubuntu/sentinel-stack"
+    state: directory
+
+- name: Pull latest code from GitHub
+  git:
+    repo: 'https://github.com/Shivendranz/ultimate-automation-project.git'
+    dest: "/home/ubuntu/sentinel-stack"
+    force: yes
+
+- name: Shutdown old containers (if any)
+  shell: "docker compose down"
+  args:
+    chdir: "/home/ubuntu/sentinel-stack"
+  ignore_errors: yes
+
+- name: Build and Start Sentinel Dashboard
+  shell: "docker compose up -d --build"
+  args:
+    chdir: "/home/ubuntu/sentinel-stack"
+
+- name: Clean up unused Docker images
+  shell: "docker image prune -f"
