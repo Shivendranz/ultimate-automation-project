@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=redis-db
+    depends_on:
+      - redis-db
+    networks:
+      - sentinel-net
+
+  redis-db:
+    image: redis:alpine
+    networks:
+      - sentinel-net
+
+networks:
+  sentinel-net:
+    driver: bridge

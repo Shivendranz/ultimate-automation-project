@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentinel Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="container mx-auto px-4 py-10 text-center">
+        <h1 class="text-4xl font-bold mb-8 text-blue-500">🚀 Sentinel Pro Dashboard</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div class="bg-gray-800 p-6 rounded-lg border-b-4 border-blue-500">
+                <p class="text-gray-400">Total Visitors</p>
+                <h2 id="visitors" class="text-3xl font-bold">...</h2>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border-b-4 border-green-500">
+                <p class="text-gray-400">CPU Usage</p>
+                <h2 id="cpu" class="text-3xl font-bold">...</h2>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border-b-4 border-purple-500">
+                <p class="text-gray-400">RAM Usage</p>
+                <h2 id="ram" class="text-3xl font-bold">...</h2>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateStats() {
+            fetch('/stats').then(res => res.json()).then(data => {
+                document.getElementById('visitors').innerText = data.visitors;
+                document.getElementById('cpu').innerText = data.cpu;
+                document.getElementById('ram').innerText = data.ram;
+            }).catch(err => console.log("Waiting for API..."));
+        }
+        setInterval(updateStats, 2000);
+        updateStats();
+    </script>
+</body>
+</html>
