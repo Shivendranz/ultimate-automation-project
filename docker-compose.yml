@@ -4,6 +4,8 @@ services:
   flask_app:
     build: .
     container_name: sentinel_backend
+    ports:
+      - "5000:5000"
     restart: always
     environment:
       - REDIS_HOST=redis-db
@@ -33,6 +35,8 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: sentinel_prometheus
+    ports:
+      - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     restart: always
@@ -52,6 +56,43 @@ services:
     image: prom/node-exporter
     container_name: sentinel_node_exporter
     restart: always
+    networks:
+      - sentinel-net
+
+  # --- AB YAHAN SE NAYA DATABASE SETUP ADD KARO ---
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_database
+    networks:
+      - sentinel-net
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://user:password@postgres:5432/my_database?sslmode=disable"
+    depends_on:
+      - postgres
+    networks:
+      - sentinel-net
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_db
+    networks:
+      - sentinel-net
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.40
+    container_name: mongodb_exporter
+    command: ["--mongodb.uri=mongodb://mongodb:27017"]
+    depends_on:
+      - mongodb
     networks:
       - sentinel-net
 
