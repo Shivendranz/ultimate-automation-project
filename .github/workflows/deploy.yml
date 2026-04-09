@@ -14,10 +14,13 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          # 'EOF' use karne se key ka format (new lines) bigadta nahi hai
           cat <<EOF > ~/.ssh/id_rsa
           ${{ secrets.SSH_PRIVATE_KEY }}
           EOF
           chmod 600 ~/.ssh/id_rsa
+          # IP check aur known_hosts setup
           ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
 
       - name: Install Ansible
@@ -28,8 +31,10 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           cd ansible
+          # Inventory file create karna - Path hamesha ~/.ssh/id_rsa rakhein
           echo "[aws_server]" > inventory.ini
           echo "${{ secrets.EC2_IP }} ansible_user=${{ secrets.EC2_USER }} ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
           
+          # Connection testing ke liye host key checking off
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i inventory.ini deploy.yml
